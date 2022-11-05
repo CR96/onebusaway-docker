@@ -1,5 +1,5 @@
 # Maven fails to build the OBA modules under JDK 9
-FROM maven:3-jdk-8 AS build
+FROM maven:3-openjdk-18 AS build
 
 RUN git clone \
 	--depth 1 \
@@ -11,7 +11,7 @@ RUN mvn install \
 	-D license.skip=true \
 	-D maven.test.skip=true
 
-FROM tomcat:8
+FROM tomcat:10
 
 ENV JAVA_OPTS="-Xss4m"
 
@@ -19,9 +19,9 @@ RUN mkdir /app
 
 RUN wget \
 	--directory-prefix /usr/local/tomcat/lib \
-	https://jdbc.postgresql.org/download/postgresql-42.2.6.jar
+	https://jdbc.postgresql.org/download/postgresql-42.5.0.jar
 
-COPY --from=build /app/onebusaway-transit-data-federation-builder/target/onebusaway-transit-data-federation-builder-2.0.1-SNAPSHOT-withAllDependencies.jar /app
+COPY --from=build /app/onebusaway-transit-data-federation-builder/target/onebusaway-transit-data-federation-builder-2.1.2-SNAPSHOT-withAllDependencies.jar /app
 
 COPY --from=build /app/onebusaway-transit-data-federation-webapp/target/onebusaway-transit-data-federation-webapp.war /tmp
 RUN unzip \
